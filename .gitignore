@@ -4,3 +4,7 @@
 /order/target/
 /product-server/target/
 /user/target/
+/gateway/gateway.iml
+/order/order.iml
+/product/src/main/resources/rebel.xml
+/mall-parent.iml
