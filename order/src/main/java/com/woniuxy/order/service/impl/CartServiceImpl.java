@@ -10,6 +10,7 @@ import com.woniuxy.order.mapper.CartMapper;
 import com.woniuxy.order.mapper.PublishMapper;
 import com.woniuxy.order.service.CartService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -56,5 +57,32 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements Ca
             return;
         }
         cartMapper.insert(BeanUtil.copyProperties(cartParam, Cart.class));
+    }
+
+    /**
+     * 修改购物车
+     *
+     * @param cartParam 购物车信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCart(CartParam cartParam) {
+        // 查询购物车信息
+        Cart cart = cartMapper.selectOne(new QueryWrapper<Cart>().eq(Cart.P_ID, cartParam.getPId()).eq(Cart.U_ID, cartParam.getUId()));
+        // 判断是否存在
+        if (cart == null) {
+            throw new RuntimeException("未查询到购物车信息");
+        }
+        // 判断数量
+        if (cartParam.getNumber() == 0 ) {
+            // 数量为零删除购物车信息
+            cartMapper.deleteById(cart.getId());
+            return;
+        }
+        // 不为 0 则改变数量
+        int updateRow = cartMapper.updateById(cart.setNumber(cartParam.getNumber()));
+        if (updateRow < 1) {
+            throw new RuntimeException("修改失败");
+        }
     }
 }

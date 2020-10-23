@@ -35,6 +35,8 @@ public class User implements Serializable {
 
     private Integer age;
 
+    private Double money;
+
     @Version
     private Integer version;
 
@@ -45,5 +47,7 @@ public class User implements Serializable {
     public static final String NAME = "name";
 
     public static final String AGE = "age";
+
+    public static final String MONEY = "money";
 
 }

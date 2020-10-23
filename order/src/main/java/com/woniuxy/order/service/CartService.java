@@ -20,4 +20,10 @@ public interface CartService extends IService<Cart> {
      */
     void saveCart(CartParam cartParam);
 
+    /**
+     * 修改购物车
+     * @param cartParam 购物车信息
+     */
+    void updateCart(CartParam cartParam);
+
 }

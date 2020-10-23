@@ -48,16 +48,16 @@ public class MybatisPlusCodeGenerator {
         // 是否打开输出目录
         config.setOpen(false);
         // 开启 Swagger2
-        config.setSwagger2(true);
+        //config.setSwagger2(true);
 
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
         // 数据库类型
         dsc.setDbType(DbType.MYSQL);
         dsc.setDriverName("com.mysql.jdbc.Driver")
-                .setUrl("jdbc:mysql://localhost:3306/shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false")
+                .setUrl("jdbc:mysql://zhno.xyz:3306/shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false")
                 .setUsername("root")
-                .setPassword("");
+                .setPassword("3320");
 
         // 策略配置
         StrategyConfig sc = new StrategyConfig();

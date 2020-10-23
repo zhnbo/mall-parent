@@ -21,8 +21,5 @@ public class ParameterParam {
 
     private Integer pId;
 
-//    private String params;
-
-//    private Map<String, Object> params;
     private List<Object> params;
 }
