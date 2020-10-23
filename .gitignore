@@ -1,0 +1,6 @@
+# Project exclude paths
+/commons/target/
+/gateway/target/
+/order/target/
+/product-server/target/
+/user/target/
