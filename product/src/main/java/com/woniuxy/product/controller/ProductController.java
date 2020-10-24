@@ -1,6 +1,7 @@
 package com.woniuxy.product.controller;
 
 
+import com.woniuxy.commons.param.MediaParam;
 import com.woniuxy.commons.param.ParameterParam;
 import com.woniuxy.commons.param.ProductParam;
 import com.woniuxy.commons.param.PublishParam;
@@ -75,6 +76,17 @@ public class ProductController {
     @GetMapping("/parameter/{pId}")
     public Object getParams(@PathVariable("pId") Integer pId) throws Exception {
         return ResponseResult.success(productService.getParams(pId));
+    }
+
+    /**
+     * 商品媒体属性维护
+     * @param mediaParam 媒体属性参数
+     */
+    @PutMapping("/media")
+    public Object updateMedia(MediaParam mediaParam) {
+        log.info("传输参数:  {}", mediaParam);
+        productService.updateMedia(mediaParam);
+        return ResponseResult.success("更新成功");
     }
 
 }

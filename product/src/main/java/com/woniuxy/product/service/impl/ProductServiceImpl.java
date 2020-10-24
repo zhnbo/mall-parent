@@ -9,6 +9,7 @@ import com.woniuxy.commons.entity.Operation;
 import com.woniuxy.commons.entity.Parameter;
 import com.woniuxy.commons.entity.Product;
 import com.woniuxy.commons.entity.Publish;
+import com.woniuxy.commons.param.MediaParam;
 import com.woniuxy.commons.param.ParameterParam;
 import com.woniuxy.commons.param.ProductParam;
 import com.woniuxy.commons.param.PublishParam;
@@ -50,7 +51,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Autowired
     private ObjectMapper objectMapper;
-
 
     /**
      * 新增商品
@@ -162,6 +162,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      */
     @Override
     public void updateParam(ParameterParam parameterParam) throws Exception {
+        // 判断商品是否存在
+        productIsExists(parameterParam.getPId());
         // 判断数据是否存在
         Parameter parameter = parameterMapper.selectOne(new QueryWrapper<Parameter>().eq(Parameter.P_ID, parameterParam.getPId()));
         if (parameter != null) {
@@ -193,5 +195,59 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         ParameterDTO parameterDTO = BeanUtil.copyProperties(parameter, ParameterDTO.class);
         parameterDTO.setParam(objectMapper.readValue(parameter.getParams(), List.class));
         return parameterDTO;
+    }
+
+    /**
+     * 商品媒体属性维护
+     *
+     * @param mediaParam 商品媒体属性信息
+     */
+    @Override
+    public void updateMedia(MediaParam mediaParam) {
+        // 判断商品是否存在
+        productIsExists(mediaParam.getPId());
+        // 判断是否存在媒体属性
+        Parameter parameter = parameterMapper.selectOne(new QueryWrapper<Parameter>().eq(Parameter.P_ID, mediaParam.getPId()));
+        if (parameter != null) {
+            BeanUtil.copyProperties(mediaParam, parameter);
+            log.info("修改数据:  {}", parameter);
+            parameterMapper.updateById(parameter);
+            return;
+        }
+        Parameter params = BeanUtil.copyProperties(mediaParam, Parameter.class);
+        log.info("新增数据:  {}", params);
+        parameterMapper.insert(params);
+    }
+
+    ///**
+    // * 获取商品媒体属性
+    // *
+    // * @param pId 商品 ID
+    // */
+    //@Override
+    //public ParameterDTO getMedia(Integer pId) throws Exception {
+    //    // 判断参数是否合法
+    //    if (pId == null) {
+    //        throw new RuntimeException("参数异常");
+    //    }
+    //    Parameter parameter = parameterMapper.selectOne(new QueryWrapper<Parameter>().eq(Parameter.P_ID, pId));
+    //    if (parameter == null) {
+    //        throw new RuntimeException("未找到该商品信息");
+    //    }
+    //    ParameterDTO parameterDTO = BeanUtil.copyProperties(parameter, ParameterDTO.class);
+    //    parameterDTO.setParam(objectMapper.readValue(parameter.getParams(), List.class));
+    //    return parameterDTO;
+    //}
+
+    /**
+     * 判断是否存在
+     */
+    private Product productIsExists (Integer pId) {
+        // 判断商品是否存在
+        Product product = productMapper.selectById(pId);
+        if (pId == null) {
+            throw new RuntimeException("商品不存在");
+        }
+        return product;
     }
 }

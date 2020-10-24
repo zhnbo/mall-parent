@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -19,8 +21,10 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class OrderItemParam implements Serializable {
 
+    @NotNull
     private Integer pId;
 
+    @Min(1)
     private Integer number;
 
 }

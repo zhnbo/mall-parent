@@ -1,10 +1,11 @@
-package com.woniuxy.commons.entity;
+package com.woniuxy.commons.param;
 
-import com.woniuxy.commons.param.OrderItemParam;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -17,8 +18,11 @@ import java.util.List;
 @Accessors(chain = true)
 public class OrderParam implements Serializable {
 
+    @NotNull
     private Integer uId;
 
+    @NotEmpty
+    @NotNull
     private List<OrderItemParam> products;
 
 }

@@ -37,9 +37,17 @@ spring:
           uri: lb://order-server
           predicates:
             - Path=/order/**
+        - id: file_route
+          uri: lb://file-server
+          predicates:
+            - Path=/file/**
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://zhno.xyz:3306/shop?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://zhno.xyz:3306/shop?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 3320
+ # 自定义需要认证列表
+list:
+  items:
+    - "test"

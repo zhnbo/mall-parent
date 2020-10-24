@@ -8,10 +8,11 @@
     <artifactId>mall-parent</artifactId>
     <version>1.0.1</version>
     <modules>
-        <module>product-server</module>
+        <module>product</module>
         <module>user</module>
         <module>order</module>
         <module>gateway</module>
+        <module>file</module>
     </modules>
     <packaging>pom</packaging>
     <parent>

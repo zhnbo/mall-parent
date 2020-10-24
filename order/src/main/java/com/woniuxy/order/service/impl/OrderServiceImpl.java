@@ -6,10 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.woniuxy.commons.entity.*;
 import com.woniuxy.commons.param.OrderItemParam;
-import com.woniuxy.order.mapper.OrderItemMapper;
-import com.woniuxy.order.mapper.OrderMapper;
-import com.woniuxy.order.mapper.PublishMapper;
-import com.woniuxy.order.mapper.UserMapper;
+import com.woniuxy.commons.param.OrderParam;
+import com.woniuxy.order.mapper.*;
 import com.woniuxy.order.service.OrderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +38,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private CartMapper cartMapper;
 
     /**
      * 下单
@@ -96,6 +97,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
             // 减去余额
             user.setMoney(user.getMoney() - orderItem.getTotal());
+            // 清楚购物车信息
+            Cart cart = cartMapper.selectOne(new QueryWrapper<Cart>().eq(Cart.P_ID, orderItem.getPId()).eq(Cart.U_ID, user.getId()));
+            if (cart != null) {
+                cartMapper.deleteById(cart);
+            }
             // 计算订单总价
             total += orderItem.getTotal();
         }

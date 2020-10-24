@@ -34,4 +34,6 @@ public class ParameterDTO implements Serializable {
 
     private List<Map<String, Object>> param;
 
+    private List<String> media;
+
 }

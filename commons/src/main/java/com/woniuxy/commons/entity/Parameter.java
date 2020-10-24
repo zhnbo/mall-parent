@@ -35,6 +35,8 @@ public class Parameter implements Serializable {
 
     private String params;
 
+    private String media;
+
     @Version
     private Integer version;
 

@@ -1,9 +1,10 @@
 package com.woniuxy.order.controller;
 
-import com.woniuxy.commons.entity.OrderParam;
+import com.woniuxy.commons.param.OrderParam;
 import com.woniuxy.commons.result.ResponseResult;
 import com.woniuxy.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,11 @@ public class OrderController {
         System.out.println("参数：   " + orderParam);
         orderService.addOrder(orderParam);
         return ResponseResult.success();
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "Test";
     }
 
 }

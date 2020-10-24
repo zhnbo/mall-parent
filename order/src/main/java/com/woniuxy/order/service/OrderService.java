@@ -2,7 +2,7 @@ package com.woniuxy.order.service;
 
 import com.woniuxy.commons.entity.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.woniuxy.commons.entity.OrderParam;
+import com.woniuxy.commons.param.OrderParam;
 
 /**
  * <p>
