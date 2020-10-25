@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -18,9 +19,12 @@ import java.util.List;
 @Accessors(chain = true)
 public class MediaParam {
 
+    @NotNull
     private Integer uId;
 
+    @NotNull
     private Integer pId;
 
+    @NotNull
     private List<String> media;
 }
