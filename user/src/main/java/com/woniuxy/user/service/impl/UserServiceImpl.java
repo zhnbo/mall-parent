@@ -9,18 +9,24 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woniuxy.commons.dto.UserDTO;
 import com.woniuxy.commons.entity.User;
 import com.woniuxy.commons.jwt.util.JwtUtils;
 import com.woniuxy.commons.param.UserParam;
 import com.woniuxy.user.mapper.UserMapper;
 import com.woniuxy.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -30,11 +36,15 @@ import java.util.List;
  * @author zh_o
  * @since 2020-10-21
  */
+@Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     @Resource
     private UserMapper userMapper;
+
+    @Autowired
+    private ObjectMapper json;
 
     public UserServiceImpl() {
         initDegrade();
@@ -141,5 +151,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         map.put(User.TEL, tel);
         map.put(User.ID, user.getId() + "");
         return JwtUtils.getToken(map);
+    }
+
+    /**
+     * QQ 登录
+     *
+     * @param code 回调 Code
+     * @return 令牌
+     */
+    @Override
+    public String qqLogin(String code) throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+        log.info("当前 code: {}", code);
+        // 获取 AccessToken
+        String accessToken = restTemplate.getForObject("https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id=101780702&client_secret=be3cf79b89eafe3f0b8f90462aed8065&code=" + code + "&redirect_uri=http://www.pawntest.com/qqlogin", String.class);
+        if (accessToken != null) {
+            accessToken = accessToken.substring(accessToken.indexOf("=") + 1, accessToken.indexOf("&"));
+        }
+        log.info("当前 AccessToken:  {}", accessToken);
+        // 获取 OpenId
+        String jsonStr = restTemplate.getForObject("https://graph.qq.com/oauth2.0/me?fmt=json&access_token=" + accessToken, String.class);
+        Map<String, String> map = json.readValue(jsonStr, Map.class);
+        String openId = map.get("openid");
+        log.info("当前 OpenId:  {}", openId);
+        // 获取用户信息
+        String userMsg = restTemplate.getForObject("https://graph.qq.com/user/get_user_info?access_token=" + accessToken + "&oauth_consumer_key=101780702&openid=" + openId, String.class);
+        log.info("当前用户信息:  {}", userMsg);
+        Map<String, String> userInfo = json.readValue(userMsg, Map.class);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("nickname", userInfo.get("nickname"));
+        String token = JwtUtils.getToken(hashMap);
+        return token;
     }
 }

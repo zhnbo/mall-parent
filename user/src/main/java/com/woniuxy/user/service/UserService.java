@@ -2,6 +2,7 @@ package com.woniuxy.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.woniuxy.commons.dto.UserDTO;
 import com.woniuxy.commons.entity.User;
 import com.woniuxy.commons.param.UserParam;
@@ -42,4 +43,11 @@ public interface UserService extends IService<User> {
      * @return 令牌
      */
     String login(String tel, String password);
+
+    /**
+     * QQ 登录
+     * @param code 回调 Code
+     * @return 令牌
+     */
+    String qqLogin(String code) throws JsonProcessingException;
 }

@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author zh_o
  * @since 2020-10-21
  */
+@Slf4j
 @RestController
 @Api(tags = "用户接口")
 public class UserController {
@@ -35,7 +37,7 @@ public class UserController {
      * @param uId 用户 id
      */
     @ApiOperation("查询指定用户信息")
-    @GetMapping("/user/{uId}")
+    @GetMapping("/user/get/{uId}")
     @ApiImplicitParam(name = "uId", value = "用户 ID")
     public Object getUserById(@PathVariable("uId") Integer uId) throws Exception {
         return ResponseResult.success(userService.getUserById(uId));
@@ -62,7 +64,7 @@ public class UserController {
      * @param pageNum 当前页
      * @param pageSize 每页显示数据数量
      */
-    @GetMapping("/user/{pageNum}/{pageSize}")
+    @GetMapping("/user/limit/{pageNum}/{pageSize}")
     @ApiOperation("获取用户列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNum", value = "当前页"),
@@ -85,19 +87,15 @@ public class UserController {
 
     /**
      * QQ登录
-     * @param tel 用户名
-     * @param password 密码
      * @return Token
      */
-    @PostMapping("/user/qqLogin")
-    public Object qqLogin(String tel, String password) {
-        return userService.login(tel, password);
+    @GetMapping("/qqlogin")
+    public Object qqLogin(String code) throws Exception {
+        // 返回 JS 代码关闭窗口
+        return "<div>*"+ userService.qqLogin(code) + "*</div><script>window.opener=null;\n" +
+                "window.open('','_self');\n" +
+                "window.close();</script>";
     }
 
-
-    @GetMapping("/user/test")
-    public Object test() {
-        return "认证成功......";
-    }
 }
 
