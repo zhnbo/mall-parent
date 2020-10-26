@@ -5,11 +5,13 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.RuleConstant;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.woniuxy.commons.dto.UserDTO;
 import com.woniuxy.commons.entity.User;
+import com.woniuxy.commons.jwt.util.JwtUtils;
 import com.woniuxy.commons.param.UserParam;
 import com.woniuxy.user.mapper.UserMapper;
 import com.woniuxy.user.service.UserService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -113,5 +116,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         rules.add(degradeRule);
         // 加载规则
         DegradeRuleManager.loadRules(rules);
+    }
+
+    /**
+     * 用户登录
+     *
+     * @param tel 电话
+     * @param password 密码
+     * @return 令牌
+     */
+    @Override
+    public String login(String tel, String password) {
+        // 判断账号是否存在
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq(User.TEL, tel));
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        // 判断密码是否正确
+        if (!user.getPassword().equals(password)) {
+            throw new RuntimeException("密码错误");
+        }
+        // 生成 Token
+        HashMap<String, String> map = new HashMap<>();
+        map.put(User.TEL, tel);
+        map.put(User.ID, user.getId() + "");
+        return JwtUtils.getToken(map);
     }
 }

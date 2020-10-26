@@ -72,5 +72,20 @@ public class UserController {
         return ResponseResult.success(userService.listUser(pageNum, pageSize));
     }
 
+    /**
+     * 用户登录
+     * @param tel 用户名
+     * @param password 密码
+     * @return Token
+     */
+    @PostMapping("/user/login")
+    public Object login(String tel, String password) {
+        return userService.login(tel, password);
+    }
+
+    @GetMapping("/user/test")
+    public Object test() {
+        return "认证成功......";
+    }
 }
 

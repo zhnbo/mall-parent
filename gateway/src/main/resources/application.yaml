@@ -48,6 +48,6 @@ spring:
     username: root
     password: 3320
  # 自定义需要认证列表
-list:
-  items:
-    - "test"
+include:
+  paths:
+    - "/user/test"

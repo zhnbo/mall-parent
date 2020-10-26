@@ -34,4 +34,12 @@ public interface UserService extends IService<User> {
      * @param pageSize 每页显示条数
      */
     IPage<User> listUser(Integer pageNum, Integer pageSize) throws Exception;
+
+    /**
+     * 用户登录
+     * @param tel 电话
+     * @param password 密码
+     * @return 令牌
+     */
+    String login(String tel, String password);
 }
