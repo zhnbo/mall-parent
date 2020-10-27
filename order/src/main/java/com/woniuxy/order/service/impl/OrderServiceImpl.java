@@ -103,7 +103,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             user.setMoney(user.getMoney() - orderItem.getTotal());
             // 新增商品购买量
             Transaction multi = jedis.multi();
-            jedis.hsetnx("product:" + orderItem.getPId(), "buyNumber", orderItem.getNumber() + "");
+            jedis.hincrBy("product:" + orderItem.getPId(),"buyNumber", orderItem.getNumber());
             multi.exec();
             // 清楚购物车信息
             Cart cart = cartMapper.selectOne(new QueryWrapper<Cart>().eq(Cart.P_ID, orderItem.getPId()).eq(Cart.U_ID, user.getId()));
