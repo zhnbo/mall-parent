@@ -85,6 +85,11 @@ public class UserController {
         return userService.login(tel, password);
     }
 
+    @GetMapping("/user/test")
+    public Object test() {
+        return "认证成功......";
+    }
+
     /**
      * QQ登录
      * @return Token

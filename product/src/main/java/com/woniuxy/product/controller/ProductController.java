@@ -10,6 +10,7 @@ import com.woniuxy.product.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import redis.clients.jedis.Jedis;
 
 /**
  * 商品控制器
@@ -23,6 +24,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    private Jedis jedis = new Jedis("zhno.xyz", 6379);
+
 
     /**
      * 新增商品
@@ -75,6 +79,8 @@ public class ProductController {
      */
     @GetMapping("/parameter/{pId}")
     public Object getParams(@PathVariable("pId") Integer pId) throws Exception {
+        // 浏览量 + 1
+        jedis.incr("product:" + pId + ":count");
         return ResponseResult.success(productService.getParams(pId));
     }
 

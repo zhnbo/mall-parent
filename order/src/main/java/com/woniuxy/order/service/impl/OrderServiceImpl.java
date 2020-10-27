@@ -11,6 +11,8 @@ import com.woniuxy.order.mapper.*;
 import com.woniuxy.order.service.OrderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -41,6 +43,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Resource
     private CartMapper cartMapper;
+
+    private Jedis jedis = new Jedis("zhno.xyz", 6379);
 
     /**
      * 下单
@@ -97,6 +101,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
             // 减去余额
             user.setMoney(user.getMoney() - orderItem.getTotal());
+            // 新增商品购买量
+            Transaction multi = jedis.multi();
+            jedis.hsetnx("product:" + orderItem.getPId(), "buyNumber", orderItem.getNumber() + "");
+            multi.exec();
             // 清楚购物车信息
             Cart cart = cartMapper.selectOne(new QueryWrapper<Cart>().eq(Cart.P_ID, orderItem.getPId()).eq(Cart.U_ID, user.getId()));
             if (cart != null) {

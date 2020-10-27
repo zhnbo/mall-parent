@@ -11,6 +11,8 @@ import com.woniuxy.order.mapper.PublishMapper;
 import com.woniuxy.order.service.CartService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 import javax.annotation.Resource;
 
@@ -30,6 +32,8 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements Ca
 
     @Resource
     private PublishMapper publishMapper;
+
+    private Jedis jedis = new Jedis("zhno.xyz", 6379);
 
     /**
      * 添加购物车
@@ -54,8 +58,13 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements Ca
             // 已存在改变数量
             cart.setNumber(cartParam.getNumber() + cart.getNumber());
             cartMapper.updateById(cart);
+            // Redis
+            jedis.hset("user:cart:" + cart.getUId(), cart.getPId() + "", cart.getNumber() + "");
             return;
         }
+        Transaction multi = jedis.multi();
+        jedis.hset("user:cart:" + cartParam.getUId() + "", cartParam.getUId() + "", cartParam.getNumber() + "");
+        multi.exec();
         cartMapper.insert(BeanUtil.copyProperties(cartParam, Cart.class));
     }
 
@@ -77,10 +86,12 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements Ca
         if (cartParam.getNumber() == 0 ) {
             // 数量为零删除购物车信息
             cartMapper.deleteById(cart.getId());
+            jedis.hdel(cart.getUId() + "");
             return;
         }
         // 不为 0 则改变数量
         int updateRow = cartMapper.updateById(cart.setNumber(cartParam.getNumber()));
+        jedis.hset("user:cart:" + cartParam.getUId() + "", cartParam.getPId() + "", cartParam.getNumber() + "");
         if (updateRow < 1) {
             throw new RuntimeException("修改失败");
         }
