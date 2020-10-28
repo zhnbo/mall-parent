@@ -1,12 +1,16 @@
 package com.woniuxy.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.woniuxy.commons.dto.ParameterDTO;
 import com.woniuxy.commons.entity.Product;
+import com.woniuxy.commons.entity.Publish;
 import com.woniuxy.commons.param.MediaParam;
 import com.woniuxy.commons.param.ParameterParam;
 import com.woniuxy.commons.param.ProductParam;
 import com.woniuxy.commons.param.PublishParam;
+
+import java.util.List;
 
 /**
  * <p>
@@ -54,11 +58,13 @@ public interface ProductService extends IService<Product> {
      * @param mediaParam 商品媒体属性信息
      */
     void updateMedia(MediaParam mediaParam);
-    //
-    ///**
-    // * 获取商品媒体属性
-    // *
-    // * @param pId 商品 ID
-    // */
-    //ParameterDTO getMedia(Integer pId) throws Exception;
+
+    List<Publish> getRanking(Integer start, Integer end) throws JsonProcessingException;
+
+    /**
+     * 获取商品列表
+     * @param start 起始
+     * @param end 结束
+     */
+    List<Publish> listPublish(Integer start, Integer end) throws JsonProcessingException;
 }

@@ -1,6 +1,7 @@
 package com.woniuxy.product.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.woniuxy.commons.param.MediaParam;
 import com.woniuxy.commons.param.ParameterParam;
 import com.woniuxy.commons.param.ProductParam;
@@ -93,6 +94,24 @@ public class ProductController {
         log.info("传输参数:  {}", mediaParam);
         productService.updateMedia(mediaParam);
         return ResponseResult.success("更新成功");
+    }
+
+    /**
+     * 获取发布商品列表
+     * @param start 起始
+     * @param end 结束
+     */
+    @GetMapping("/publishList")
+    public Object getPublishList(Integer start, Integer end) throws JsonProcessingException {
+        return ResponseResult.success(productService.listPublish(start, end));
+    }
+
+    /**
+     * 获取商品排行榜
+     */
+    @GetMapping("/ranking")
+    public Object getRanking(Integer start, Integer end) throws JsonProcessingException {
+        return ResponseResult.success(productService.getRanking(start, end));
     }
 
 }

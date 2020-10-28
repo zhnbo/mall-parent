@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +33,12 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisTemplate<Object, Object> rt;
+
+    @Autowired
+    private StringRedisTemplate srt;
 
     /**
      * 根据 id 查询用户
@@ -102,5 +110,15 @@ public class UserController {
                 "window.close();</script>";
     }
 
+    @GetMapping("/user/getKey")
+    public Object testGet(String key) {
+        return srt.opsForValue().get(key);
+    }
+
+    @GetMapping("/user/getHash")
+    public Object testGetH() {
+        log.info("test");
+        return rt.opsForHash().get("user:3", "name");
+    }
 }
 

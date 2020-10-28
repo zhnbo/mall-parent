@@ -3,6 +3,7 @@ package com.woniuxy.product.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woniuxy.commons.dto.ParameterDTO;
 import com.woniuxy.commons.entity.Operation;
@@ -20,9 +21,12 @@ import com.woniuxy.product.mapper.PublishMapper;
 import com.woniuxy.product.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,6 +55,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private StringRedisTemplate srt;
+
+    @Autowired
+    private RedisTemplate<Object, Object> rt;
+
+    @Autowired
+    private RedisTemplate<String, Object> jrt;
 
     /**
      * 新增商品
@@ -107,6 +120,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             System.out.println("发布数据:   " + publish);
             // 修改发布表数据
             publishMapper.updateById(publish);
+            // 修改对应 Redis 数据
+            jrt.opsForHash().put("publish", publish.getId() + "", publish);
             // 减少库存,修改商品状态
             product.setCount(product.getCount() - publishParam.getNumber());
             product.setStatus(2);
@@ -117,6 +132,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         Publish publish = BeanUtil.copyProperties(publishParam, Publish.class);
         System.out.println("发布数据:   " + publish);
         publishMapper.insert(publish);
+        // 新增到 Redis
+        jrt.opsForHash().put("publish", publish.getId() + "", publish);
+        // 将 id 存入商品列表
+        jrt.opsForList().leftPush("publish:list", publish.getId());
         // 减少库存,修改商品状态
         product.setCount(product.getCount() - publishParam.getNumber());
         product.setStatus(2);
@@ -219,25 +238,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         parameterMapper.insert(params);
     }
 
-    ///**
-    // * 获取商品媒体属性
-    // *
-    // * @param pId 商品 ID
-    // */
-    //@Override
-    //public ParameterDTO getMedia(Integer pId) throws Exception {
-    //    // 判断参数是否合法
-    //    if (pId == null) {
-    //        throw new RuntimeException("参数异常");
-    //    }
-    //    Parameter parameter = parameterMapper.selectOne(new QueryWrapper<Parameter>().eq(Parameter.P_ID, pId));
-    //    if (parameter == null) {
-    //        throw new RuntimeException("未找到该商品信息");
-    //    }
-    //    ParameterDTO parameterDTO = BeanUtil.copyProperties(parameter, ParameterDTO.class);
-    //    parameterDTO.setParam(objectMapper.readValue(parameter.getParams(), List.class));
-    //    return parameterDTO;
-    //}
 
     /**
      * 判断是否存在
@@ -249,5 +249,47 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             throw new RuntimeException("商品不存在");
         }
         return product;
+    }
+
+    /**
+     * 获取商品列表
+     *
+     * @param start 起始
+     * @param end   结束
+     */
+    @Override
+    public List<Publish> listPublish(Integer start, Integer end) throws JsonProcessingException {
+        // 查询商品列表
+        List<Object> list = jrt.opsForList().range("publish:list", start, end);
+        // 根据 ID 获取商品详细信息
+        ArrayList<Publish> publishList = new ArrayList<>();
+        if (list == null) {
+            throw new RuntimeException("无数据");
+        }
+        for (Object o : list) {
+            Integer i = Integer.valueOf(o + "");
+            Publish publish = objectMapper.readValue(objectMapper.writeValueAsString(jrt.opsForHash().get("publish", i + "")), Publish.class);
+            publishList.add(publish);
+        }
+        return publishList;
+    }
+
+    @Override
+    public List<Publish> getRanking(Integer start, Integer end) throws JsonProcessingException {
+        // 查询商品列表
+        List<Object> list = jrt.opsForList().range("publish:list", start, end);
+        // 根据 ID 获取商品详细信息
+        ArrayList<Publish> publishList = new ArrayList<>();
+        if (list == null) {
+            throw new RuntimeException("无数据");
+        }
+        for (Object o : list) {
+            Integer i = Integer.valueOf(o + "");
+            Publish publish = objectMapper.readValue(objectMapper.writeValueAsString(jrt.opsForHash().get("publish", i + "")), Publish.class);
+            publishList.add(publish);
+        }
+        // 存入到排行榜列表
+
+        return publishList;
     }
 }
