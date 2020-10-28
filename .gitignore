@@ -11,3 +11,12 @@
 /product/product.iml
 /user/user.iml
 /file/target/
+/product/.rebel.xml.bak
+/commons/.rebel.xml.bak
+/commons/commons.iml
+/file/.rebel.xml.bak
+/file/file.iml
+/gateway/.rebel.xml.bak
+/order/.rebel.xml.bak
+/product/src/main/resources/META-INF/additional-spring-configuration-metadata.json
+/user/.rebel.xml.bak

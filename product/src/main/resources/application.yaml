@@ -1,0 +1,47 @@
+server:
+  # 端口号
+  port: 8081
+spring:
+  application:
+    # 服务名
+   name: product-server
+  cloud:
+    nacos:
+      # Nacos 地址
+      server-addr: zhno.xyz:8848
+  # MySQL 连接池配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://zhno.xyz:3306/shop?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 3320
+  # Lettuce 配置
+  redis:
+    database: 0
+    # 集群配置
+    cluster:
+      nodes:
+        - 49.235.75.117:6379
+        - 49.235.75.117:6380
+        - 49.235.75.117:6381
+        - 49.235.75.117:6382
+        - 49.235.75.117:6383
+        - 49.235.75.117:6384
+management:
+  endpoints:
+    web:
+      exposure:
+        # 暴露所有 WEB 端点
+        include: "*"
+mybatis-plus:
+  configuration:
+    # MyBatis-Plus 日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# 云 sentinel 配置
+project:
+  name: product
+ahas:
+  namespace: default
+  license: afe3ca93f42a4dceb1551fcf519569c3
+

@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,8 +38,8 @@ import java.util.List;
  * @author zh_o
  * @since 2020-10-21
  */
-@Service
 @Slf4j
+@Service
 public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> implements ProductService {
 
     @Resource
@@ -71,7 +72,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      * @param productParam 新增商品信息
      */
     @Override
-    public void saveProduct(ProductParam productParam) throws Exception {
+    public void saveProduct(ProductParam productParam) {
         // 判断参数是否合法
         if (productParam == null) {
             throw new RuntimeException("参数异常");
@@ -94,7 +95,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     /**
      * 上架商品
-     * @param publishParam
      */
     @Override
     public void addProduct(PublishParam publishParam) throws Exception {
@@ -112,7 +112,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             throw new Exception("商品库存不足");
         }
         // 是否已上架
-        if (product.getStatus().equals(2)) {
+        Integer i = 2;
+        if (product.getStatus().equals(i)) {
             // 查询发布数据
             Publish publish = publishMapper.selectOne(new QueryWrapper<Publish>().eq(Publish.P_ID, publishParam.getPId()));
             // 已上架,修改对应数据
@@ -133,6 +134,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         System.out.println("发布数据:   " + publish);
         publishMapper.insert(publish);
         // 新增到 Redis
+        publish.setAddTime(new Date().toString());
         jrt.opsForHash().put("publish", publish.getId() + "", publish);
         // 将 id 存入商品列表
         jrt.opsForList().leftPush("publish:list", publish.getId());
@@ -149,7 +151,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      * @param pId 商品 id
      */
     @Override
-    public void removeProduct(Integer uId, Integer pId) throws Exception {
+    public void removeProduct(Integer uId, Integer pId) {
         // 判断参数是否合法
         if (uId == null || pId == null) {
             throw new RuntimeException("参数异常");
